@@ -1,4 +1,4 @@
-# Web-based Eye Tracking Code Editor
+# WebSight: Web-based Eye Tracking Code Editor
 
 🚀 **[Try our live demo here!](https://webeyecode.netlify.app/)** 🎉
 
@@ -25,9 +25,9 @@ We developed a technical workflow for a web-based eye tracking code editor that 
 
 Below is a snapshot of our tool in action (using the mouse as a proxy for eye gaze). Feel free to try our [live demo](https://webeyecode.netlify.app/) as well!
 
-<p align="center">
+<div align="center">
     <img src="./public/demo.gif" width="700px" max-width="100%" alt="Demo">
-</p>
+</div>
 
 The main technical details can be found in `/src/components/CodeMirrorEditor.js`. Please refer to them if you want to adapt this tool for your research. We also provided an example for publishing gaze/mouse data streams from a Python server in `/public/mouse_simulation.py` (often needed in practice, as the Tobii Pro SDK doesn't provide JavaScript APIs).
 
