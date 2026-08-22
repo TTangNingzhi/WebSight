@@ -25,19 +25,34 @@ const Component = () => {
     // Option 1: Register source data stream via mouse move event.
     // We use this as for deployment demonstration.
     useEffect(() => {
+        let animationFrameId = null;
+        let latestMousePosition = null;
+
         const handleMouseMove = (event) => {
-            setMousePosOnScreen({
+            latestMousePosition = {
                 x: event.screenX, y: event.screenY,
-            });
+            };
+
+            // Mouse and gaze sources can emit faster than the browser can paint.
+            // Keep only the newest sample and update React at most once per frame.
+            if (animationFrameId === null) {
+                animationFrameId = window.requestAnimationFrame(() => {
+                    setMousePosOnScreen(latestMousePosition);
+                    animationFrameId = null;
+                });
+            }
         };
         window.addEventListener('mousemove', handleMouseMove);
         return () => {
             window.removeEventListener('mousemove', handleMouseMove);
+            if (animationFrameId !== null) {
+                window.cancelAnimationFrame(animationFrameId);
+            }
         };
     }, []);
 
     // Option 2: Register source data stream via WebSocket.
-    // For the server-side implementation of the mouse simulation, refer to /public/mouse-simulation.py.
+    // For the server-side implementation of the mouse simulation, refer to /public/mouse_simulation.py.
     // This allows you the best flexibility, especially Tobii Pro SDK does not support JavaScript.
 
     // useEffect(() => {

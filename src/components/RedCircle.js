@@ -6,9 +6,10 @@
  */
 const RedCircle = ({gazePosOnWindow}) => {
     const circleStyle = {
-        position: 'absolute',
-        top: `${gazePosOnWindow.y + window.scrollY - 10}px`,
-        left: `${gazePosOnWindow.x + window.scrollX - 10}px`,
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        transform: `translate3d(${gazePosOnWindow.x - 10}px, ${gazePosOnWindow.y - 10}px, 0)`,
         width: '20px',
         height: '20px',
         backgroundColor: 'rgba(255, 0, 0, 0.5)',

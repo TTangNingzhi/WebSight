@@ -1,9 +1,20 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import {java} from '@codemirror/lang-java';
 import {syntaxTree} from "@codemirror/language";
 import {EditorView} from "@codemirror/view";
 import RedCircle from "./RedCircle";
+
+// CodeMirror treats extensions as configuration. Reusing these instances avoids
+// reconfiguring the editor whenever a new gaze sample renders this component.
+const editorExtensions = [
+    java(),
+    EditorView.theme({
+        "&": {
+            fontSize: "16px"
+        }
+    })
+];
 
 /**
  * Get the most bottom token node in the given position from a middle layer node in the syntax tree.
@@ -14,21 +25,41 @@ import RedCircle from "./RedCircle";
 const getMostBottomToken = (node, position) => {
     let currentNode = node;
     while (currentNode.firstChild) {
-        currentNode = currentNode.childBefore(position + 1) || currentNode;
+        const child = currentNode.childBefore(position + 1);
+        if (!child || child === currentNode || child.from > position || child.to < position) {
+            return null;
+        }
+        currentNode = child;
     }
-    return currentNode.to >= position ? currentNode : null;
+    return currentNode.from <= position && currentNode.to >= position ? currentNode : null;
+};
+
+const setSemanticInfoIfChanged = (setSemanticInfo, nextSemanticInfo) => {
+    setSemanticInfo(currentSemanticInfo => (
+        currentSemanticInfo.lineNum === nextSemanticInfo.lineNum &&
+        currentSemanticInfo.columnNum === nextSemanticInfo.columnNum &&
+        currentSemanticInfo.token === nextSemanticInfo.token &&
+        currentSemanticInfo.astChain === nextSemanticInfo.astChain
+            ? currentSemanticInfo
+            : nextSemanticInfo
+    ));
 };
 
 const CodeMirrorEditor = ({code, gazePosOnScreen}) => {
 
     const [windowPosOnScreen, setWindowPosOnScreen] = useState({x: 0, y: 0});
-    const [gazePosOnWindow, setGazePosOnWindow] = useState({x: 0, y: 0});
+    const gazePosOnWindow = useMemo(() => ({
+        x: gazePosOnScreen.x - windowPosOnScreen.x,
+        y: gazePosOnScreen.y - windowPosOnScreen.y
+    }), [gazePosOnScreen.x, gazePosOnScreen.y, windowPosOnScreen.x, windowPosOnScreen.y]);
 
     // Some semantic information we want to interpret from raw gaze data, e.g., line, column, token, AST chain
-    const [lineNum, setLineNum] = useState(0);
-    const [columnNum, setColumnNum] = useState(0);
-    const [token, setToken] = useState("");
-    const [astChain, setAstChain] = useState("");
+    const [semanticInfo, setSemanticInfo] = useState({
+        lineNum: 0,
+        columnNum: 0,
+        token: "",
+        astChain: ""
+    });
 
     const editorRef = useRef(null);
 
@@ -40,10 +71,16 @@ const CodeMirrorEditor = ({code, gazePosOnScreen}) => {
     // e.g., screenX/Y, outerWidth/Height, innerWidth/Height, visualViewport. Future developers can explore more.
     useEffect(() => {
         const handleMouseMove = (event) => {
-            setWindowPosOnScreen({
+            const nextWindowPosition = {
                 x: event.screenX - event.clientX,
                 y: event.screenY - event.clientY
-            });
+            };
+            setWindowPosOnScreen(currentWindowPosition => (
+                currentWindowPosition.x === nextWindowPosition.x &&
+                currentWindowPosition.y === nextWindowPosition.y
+                    ? currentWindowPosition
+                    : nextWindowPosition
+            ));
         };
         window.addEventListener('mousemove', handleMouseMove);
         return () => {
@@ -52,19 +89,14 @@ const CodeMirrorEditor = ({code, gazePosOnScreen}) => {
     }, []);
 
     useEffect(() => {
-        // Calculate the gaze position on the window by subtracting the window position on the screen.
-        setGazePosOnWindow({
-            x: gazePosOnScreen.x - windowPosOnScreen.x,
-            y: gazePosOnScreen.y - windowPosOnScreen.y
-        });
+        const emptySemanticInfo = {
+            lineNum: 0,
+            columnNum: 0,
+            token: "",
+            astChain: ""
+        };
 
         if (editorRef.current) {
-            // Reset the semantic information
-            setLineNum(0);
-            setColumnNum(0);
-            setToken("");
-            setAstChain("");
-
             const view = editorRef.current.view;
 
             // Convert the gaze coordinates on the window to the position in the editor.
@@ -89,8 +121,11 @@ const CodeMirrorEditor = ({code, gazePosOnScreen}) => {
                     gazePosOnWindow.y >= firstCharCoords.top && gazePosOnWindow.y <= lastCharCoords.bottom &&
                     gazePosOnWindow.x >= firstCharCoords.left && gazePosOnWindow.x <= lastCharCoords.right
                 ) {
-                    setLineNum(line.number);
-                    setColumnNum(position - line.from + 1);
+                    const nextSemanticInfo = {
+                        ...emptySemanticInfo,
+                        lineNum: line.number,
+                        columnNum: position - line.from + 1
+                    };
                     const tree = syntaxTree(view.state);
                     // Get the AST node at the given position. However, it is not the most bottom token, could be a middle layer node.
                     const node = tree.resolveInner(position, 0);
@@ -101,20 +136,23 @@ const CodeMirrorEditor = ({code, gazePosOnScreen}) => {
                             // Get the token and two parent nodes' type names as the AST chain.
                             const parent1 = bottomNode.parent;
                             const parent2 = parent1 ? parent1.parent : null;
-                            setToken(view.state.sliceDoc(bottomNode.from, bottomNode.to));
-                            setAstChain(`${bottomNode.type.name} -> ${parent1 ? parent1.type.name : ""} -> ${parent2 ? parent2.type.name : ""}`);
+                            nextSemanticInfo.token = view.state.sliceDoc(bottomNode.from, bottomNode.to);
+                            nextSemanticInfo.astChain = `${bottomNode.type.name} -> ${parent1 ? parent1.type.name : ""} -> ${parent2 ? parent2.type.name : ""}`;
                         }
                     }
+                    setSemanticInfoIfChanged(setSemanticInfo, nextSemanticInfo);
+                    return;
                 }
             }
         }
-    }, [gazePosOnScreen, windowPosOnScreen, gazePosOnWindow]);
+        setSemanticInfoIfChanged(setSemanticInfo, emptySemanticInfo);
+    }, [gazePosOnWindow]);
 
-    const myTheme = EditorView.theme({
-        "&": {
-            fontSize: "16px"
-        }
-    });
+    const handleCreateEditor = useCallback((view) => {
+        editorRef.current = {view};
+    }, []);
+
+    const {lineNum, columnNum, token, astChain} = semanticInfo;
 
     return (
         <div>
@@ -130,11 +168,9 @@ const CodeMirrorEditor = ({code, gazePosOnScreen}) => {
             </ul>
             <CodeMirror
                 value={code}
-                extensions={[java(), myTheme]} // Can be extended with more languages
+                extensions={editorExtensions} // Can be extended with more languages
                 height="500px"
-                onCreateEditor={(view) => {
-                    editorRef.current = {view};
-                }}
+                onCreateEditor={handleCreateEditor}
                 // readOnly // Can be added to disable editing
             />
         </div>
