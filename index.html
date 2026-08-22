@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A web-based eye tracking code editor">
+    <link rel="icon" href="./public/favicon.ico">
+    <link rel="stylesheet" href="./src/styles.css">
+    <title>Web Eye Editor</title>
+
+    <!--
+      CodeMirror 6 is published as a set of npm modules. This import map lets the
+      browser load those modules directly from node_modules, without React and
+      without generating a bundle. Run `npm install` once and serve this project
+      over HTTP with `npm start`; file:// cannot reliably load ES modules/fetch.
+    -->
+    <script type="importmap">
+    {
+        "imports": {
+            "codemirror": "./node_modules/codemirror/dist/index.js",
+            "@codemirror/autocomplete": "./node_modules/@codemirror/autocomplete/dist/index.js",
+            "@codemirror/commands": "./node_modules/@codemirror/commands/dist/index.js",
+            "@codemirror/lang-java": "./node_modules/@codemirror/lang-java/dist/index.js",
+            "@codemirror/language": "./node_modules/@codemirror/language/dist/index.js",
+            "@codemirror/lint": "./node_modules/@codemirror/lint/dist/index.js",
+            "@codemirror/search": "./node_modules/@codemirror/search/dist/index.js",
+            "@codemirror/state": "./node_modules/@codemirror/state/dist/index.js",
+            "@codemirror/view": "./node_modules/@codemirror/view/dist/index.js",
+            "@lezer/common": "./node_modules/@lezer/common/dist/index.js",
+            "@lezer/highlight": "./node_modules/@lezer/highlight/dist/index.js",
+            "@lezer/java": "./node_modules/@lezer/java/dist/index.js",
+            "@lezer/lr": "./node_modules/@lezer/lr/dist/index.js",
+            "crelt": "./node_modules/crelt/index.js",
+            "style-mod": "./node_modules/style-mod/src/style-mod.js",
+            "w3c-keyname": "./node_modules/w3c-keyname/index.js"
+        }
+    }
+    </script>
+</head>
+<body>
+<main class="page">
+    <header>
+        <h1>Web-based Eye Tracking Code Editor</h1>
+        <p><em>By Ningzhi Tang@SaNDwich Lab, October 2024</em></p>
+        <p>
+            From the data stream of eye gaze or mouse pointer coordinates on the screen, this tool can automatically
+            compute the corresponding code semantic information (e.g., line, column, token, and AST chain) in real
+            time.
+        </p>
+        <p>
+            It includes features like code highlighting, robust handling of scrolling, and support for code editing,
+            eliminating the need for labor-intensive and inaccurate post-processing (e.g., computer vision-based
+            methods).
+        </p>
+    </header>
+
+    <section aria-labelledby="gaze-information-heading">
+        <h2 id="gaze-information-heading" class="visually-hidden">Gaze information</h2>
+        <ul class="gaze-information">
+            <li>Data source: <span id="source-status">Starting…</span></li>
+            <li>Gaze (mouse) position on screen: X: <span id="screen-x">0</span>, Y: <span id="screen-y">0</span></li>
+            <li>Gaze (mouse) position on window: X: <span id="window-x">0</span>, Y: <span id="window-y">0</span></li>
+            <li>Gaze (mouse) is over line <span id="line-number">0</span>, column <span id="column-number">0</span>
+                <ul>
+                    <li>Token: <span id="token"></span></li>
+                    <li>AST chain: <span id="ast-chain"></span></li>
+                </ul>
+            </li>
+        </ul>
+    </section>
+
+    <div id="editor" aria-label="Java code editor"></div>
+</main>
+
+<div id="gaze-marker" aria-hidden="true"></div>
+
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>

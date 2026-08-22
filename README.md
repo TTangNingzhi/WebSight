@@ -23,13 +23,55 @@ However, existing web-based experimental setups (e.g., [[1]](https://dl.acm.org/
 
 We developed a technical workflow for a web-based eye tracking code editor that addresses these limitations. The key idea is to use [CodeMirror](https://codemirror.net/), a popular web-based code editor, to provide code highlighting and editing features. We convert eye gaze data into semantic information by leveraging CodeMirror's APIs and resolving numerous technical issues.
 
+This branch implements the demo with native HTML, CSS, and JavaScript modules. It has no React layer and no bundling step. An HTML import map loads CodeMirror directly from the locally installed npm packages, keeping the application code readable and easy to modify.
+
 Below is a snapshot of our tool in action (using the mouse as a proxy for eye gaze). Feel free to try our [live demo](https://webeyecode.netlify.app/) as well!
 
 <div align="center">
     <img src="./public/demo.gif" width="700px" max-width="100%" alt="Demo">
 </div>
 
-The main technical details can be found in `/src/components/CodeMirrorEditor.js`. Please refer to them if you want to adapt this tool for your research. We also provided an example for publishing gaze/mouse data streams from a Python server in `/public/mouse_simulation.py` (often needed in practice, as the Tobii Pro SDK doesn't provide JavaScript APIs).
+## Run locally
+
+Install CodeMirror once:
+
+```bash
+npm install
+```
+
+Start the local HTTP server:
+
+```bash
+npm start
+```
+
+Then open [http://localhost:3000](http://localhost:3000). A local HTTP server is required because browsers do not reliably allow ES modules and `fetch()` from a `file://` page. There is no build command and no generated application bundle.
+
+## Adapting the demo
+
+The most commonly changed options are intentionally placed near the top of `/src/main.js`:
+
+```js
+const CONFIG = {
+    codeFile: "./public/code/TwoSum.java",
+    gazeSource: "mouse", // "mouse" or "websocket"
+    websocketUrl: "ws://localhost:8765"
+};
+```
+
+The source is divided by responsibility:
+
+- `/index.html`: page content and the CodeMirror import map;
+- `/src/main.js`: configuration and the end-to-end gaze pipeline;
+- `/src/gaze-sources.js`: mouse demo and WebSocket data sources;
+- `/src/coordinate-mapper.js`: screen-to-browser coordinate calibration;
+- `/src/code-editor.js`: CodeMirror initialization and line/token/AST mapping;
+- `/src/gaze-ui.js`: frame-limited marker and text rendering;
+- `/src/styles.css`: all page and marker styling.
+
+The gaze pipeline does not discard high-frequency research samples. Raw and semantically mapped recording hooks run for every sample, while only the visible red marker and live coordinate/semantic text are coalesced to one update per browser animation frame. Add experiment-specific storage or transmission inside `recordRawSample` and `recordMappedSample` in `/src/main.js`.
+
+We also provide an example publisher in `/public/mouse_simulation.py`. It streams normalized mouse coordinates from a Python WebSocket server, which mirrors the bridge often needed when an eye tracker SDK such as Tobii Pro does not expose a browser JavaScript API.
 
 > We previously tried the [Monaco Editor](https://microsoft.github.io/monaco-editor/), another popular web-based code editor with core features same as VSCode. However, Monaco Editor doesn't offer any APIs to convert coordinates to the offset or line/column position in the code, which is essential for analyzing eye tracking data.
 
