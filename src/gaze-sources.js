@@ -24,7 +24,7 @@ export const startMouseGazeSource = ({onSample, onStatus}) => {
 /**
  * Option 2: receive normalized gaze coordinates through WebSocket.
  *
- * The example Python publisher is in /public/mouse_simulation.py. A WebSocket
+ * The example Python publisher is in /examples/mouse_simulation.py. A WebSocket
  * bridge provides flexibility when an eye tracker SDK (for example Tobii Pro)
  * does not expose a browser JavaScript API.
  */
