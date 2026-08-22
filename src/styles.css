@@ -1,0 +1,67 @@
+:root {
+    color: #1f2328;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    margin: 0;
+    background: #ffffff;
+}
+
+.page {
+    margin: 40px 100px;
+}
+
+.gaze-information {
+    font-variant-numeric: tabular-nums;
+}
+
+#editor {
+    height: 500px;
+    border: 1px solid #d0d7de;
+}
+
+#editor .cm-editor {
+    height: 100%;
+    font-size: 16px;
+}
+
+#editor .cm-scroller {
+    overflow: auto;
+}
+
+#gaze-marker {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgb(255 0 0 / 50%);
+    pointer-events: none;
+    transform: translate3d(-100px, -100px, 0);
+    z-index: 1000;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+@media (max-width: 800px) {
+    .page {
+        margin: 24px;
+    }
+}

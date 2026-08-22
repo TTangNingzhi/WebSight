@@ -29,7 +29,33 @@ Below is a snapshot of our tool in action (using the mouse as a proxy for eye ga
     <img src="./public/demo.gif" width="700px" max-width="100%" alt="Demo">
 </div>
 
-The main technical details can be found in `/src/components/CodeMirrorEditor.js`. Please refer to them if you want to adapt this tool for your research. We also provided an example for publishing gaze/mouse data streams from a Python server in `/public/mouse_simulation.py` (often needed in practice, as the Tobii Pro SDK doesn't provide JavaScript APIs).
+## Run locally
+
+Open this repository in VS Code, then use the **Live Server: Open with Live Server** command on `/index.html`. No dependency installation or build step is required.
+
+## Adapting the demo
+
+The most commonly changed options are intentionally placed near the top of `/src/main.js`:
+
+```js
+const CONFIG = {
+    codeFile: "./public/code/TwoSum.java",
+    gazeSource: "mouse", // "mouse" or "websocket"
+    websocketUrl: "ws://localhost:8765"
+};
+```
+
+The source is divided by responsibility:
+
+- `/index.html`: page content and the CodeMirror import map;
+- `/src/main.js`: configuration and the end-to-end gaze pipeline;
+- `/src/gaze-sources.js`: mouse demo and WebSocket data sources;
+- `/src/coordinate-mapper.js`: screen-to-browser coordinate calibration;
+- `/src/code-editor.js`: CodeMirror initialization and line/token/AST mapping;
+- `/src/gaze-ui.js`: frame-limited marker and text rendering;
+- `/src/styles.css`: all page and marker styling.
+
+We also provide an example publisher in `/examples/mouse_simulation.py`. It streams normalized mouse coordinates from a Python WebSocket server, which mirrors the bridge often needed when an eye tracker SDK such as Tobii Pro does not expose a browser JavaScript API. It is an optional integration example and is not required by the webpage.
 
 > We previously tried the [Monaco Editor](https://microsoft.github.io/monaco-editor/), another popular web-based code editor with core features same as VSCode. However, Monaco Editor doesn't offer any APIs to convert coordinates to the offset or line/column position in the code, which is essential for analyzing eye tracking data.
 

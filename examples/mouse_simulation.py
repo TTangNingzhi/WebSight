@@ -1,9 +1,17 @@
-# requirements: pip install pyautogui websockets
-# a simple websocket server that sends the mouse position to the client
-import pyautogui
+"""Publish the system mouse position as normalized WebSocket gaze samples.
+
+This is a stand-in for an eye-tracker SDK such as Tobii Pro. The browser uses
+the same WebSocket source and gaze-mapping pipeline for simulated and real data.
+
+Requirements:
+    pip install pyautogui websockets
+"""
+
 import asyncio
-import websockets
 import json
+
+import pyautogui
+import websockets
 
 
 async def get_mouse_position(websocket, frequency=60):
