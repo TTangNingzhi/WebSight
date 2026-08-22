@@ -3,10 +3,10 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="A web-based eye tracking code editor">
+    <meta name="description" content="Map eye-gaze coordinates to source-code positions, tokens, and syntax context in real time">
     <link rel="icon" href="./public/favicon.ico">
     <link rel="stylesheet" href="./src/styles.css">
-    <title>Web Eye Editor</title>
+    <title>WebSight: A Semantic Gaze-to-Code Mapping Layer for Web Experiments</title>
 
     <!--
       CodeMirror 6 is published as a set of JavaScript modules. This import map
@@ -40,17 +40,15 @@
 <body>
 <main class="page">
     <header>
-        <h1>Web-based Eye Tracking Code Editor</h1>
-        <p><em>By Ningzhi Tang@SaNDwich Lab, October 2024</em></p>
+        <h1>WebSight: A Semantic Gaze-to-Code Mapping Layer for Web Experiments</h1>
+        <p><em>By Ningzhi Tang, SaNDwich Lab</em></p>
         <p>
-            From the data stream of eye gaze or mouse pointer coordinates on the screen, this tool can automatically
-            compute the corresponding code semantic information (e.g., line, column, token, and AST chain) in real
-            time.
+            WebSight maps eye-gaze or mouse coordinates to the corresponding line, column, token, and syntax context
+            in real time.
         </p>
         <p>
-            It includes features like code highlighting, robust handling of scrolling, and support for code editing,
-            eliminating the need for labor-intensive and inaccurate post-processing (e.g., computer vision-based
-            methods).
+            Mapping remains aligned while the code is highlighted, scrolled, or edited—without screenshot-based
+            token detection, OCR, or manual remapping.
         </p>
     </header>
 
@@ -58,12 +56,12 @@
         <h2 id="gaze-information-heading" class="visually-hidden">Gaze information</h2>
         <ul class="gaze-information">
             <li>Data source: <span id="source-status">Starting…</span></li>
-            <li>Gaze (mouse) position on screen: X: <span id="screen-x">0</span>, Y: <span id="screen-y">0</span></li>
-            <li>Gaze (mouse) position on window: X: <span id="window-x">0</span>, Y: <span id="window-y">0</span></li>
-            <li>Gaze (mouse) is over line <span id="line-number">0</span>, column <span id="column-number">0</span>
+            <li>Screen position: X: <span id="screen-x">0</span>, Y: <span id="screen-y">0</span></li>
+            <li>Viewport position: X: <span id="window-x">0</span>, Y: <span id="window-y">0</span></li>
+            <li>Code position: line <span id="line-number">0</span>, column <span id="column-number">0</span>
                 <ul>
                     <li>Token: <span id="token"></span></li>
-                    <li>AST chain: <span id="ast-chain"></span></li>
+                    <li>Syntax context: <span id="ast-chain"></span></li>
                 </ul>
             </li>
         </ul>
