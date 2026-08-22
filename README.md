@@ -23,7 +23,7 @@ However, existing web-based experimental setups (e.g., [[1]](https://dl.acm.org/
 
 We developed a technical workflow for a web-based eye tracking code editor that addresses these limitations. The key idea is to use [CodeMirror](https://codemirror.net/), a popular web-based code editor, to provide code highlighting and editing features. We convert eye gaze data into semantic information by leveraging CodeMirror's APIs and resolving numerous technical issues.
 
-This branch implements the demo with native HTML, CSS, and JavaScript modules. It has no React layer and no bundling step. An HTML import map loads CodeMirror directly from the locally installed npm packages, keeping the application code readable and easy to modify.
+This branch implements the demo with native HTML, CSS, and JavaScript modules. It has no React layer, npm setup, or bundling step. An HTML import map loads pinned CodeMirror versions from jsDelivr, keeping the application code readable and easy to modify.
 
 Below is a snapshot of our tool in action (using the mouse as a proxy for eye gaze). Feel free to try our [live demo](https://webeyecode.netlify.app/) as well!
 
@@ -33,19 +33,11 @@ Below is a snapshot of our tool in action (using the mouse as a proxy for eye ga
 
 ## Run locally
 
-Install CodeMirror once:
+Open this repository in VS Code, then use the **Live Server: Open with Live Server** command on `/index.html`. No dependency installation or build step is required.
 
-```bash
-npm install
-```
+The page can also be deployed directly with GitHub Pages: select the branch and repository root as the Pages source. All application assets use relative URLs, so the demo works when hosted below a repository path such as `https://username.github.io/WebSight/`.
 
-Start the local HTTP server:
-
-```bash
-npm start
-```
-
-Then open [http://localhost:3000](http://localhost:3000). A local HTTP server is required because browsers do not reliably allow ES modules and `fetch()` from a `file://` page. There is no build command and no generated application bundle.
+An internet connection is required because CodeMirror is loaded from the CDN. All CDN URLs include exact package versions so an upstream package release cannot silently change an experiment. There is no `pip install`, `npm install`, build command, or generated application bundle.
 
 ## Adapting the demo
 
