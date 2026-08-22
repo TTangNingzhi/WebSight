@@ -55,8 +55,6 @@ The source is divided by responsibility:
 - `/src/gaze-ui.js`: frame-limited marker and text rendering;
 - `/src/styles.css`: all page and marker styling.
 
-The gaze pipeline does not discard high-frequency research samples. Raw and semantically mapped recording hooks run for every sample, while only the visible red marker and live coordinate/semantic text are coalesced to one update per browser animation frame. Add experiment-specific storage or transmission inside `recordRawSample` and `recordMappedSample` in `/src/main.js`.
-
 We also provide an example publisher in `/examples/mouse_simulation.py`. It streams normalized mouse coordinates from a Python WebSocket server, which mirrors the bridge often needed when an eye tracker SDK such as Tobii Pro does not expose a browser JavaScript API. It is an optional integration example and is not required by the webpage.
 
 > We previously tried the [Monaco Editor](https://microsoft.github.io/monaco-editor/), another popular web-based code editor with core features same as VSCode. However, Monaco Editor doesn't offer any APIs to convert coordinates to the offset or line/column position in the code, which is essential for analyzing eye tracking data.
