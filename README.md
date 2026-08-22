@@ -1,6 +1,6 @@
 # WebSight: Web-based Eye Tracking Code Editor
 
-🚀 **[Try our live demo here!](https://webeyecode.netlify.app/)** 🎉
+🚀 **[Try our live demo here!](https://www.nztang.com/WebSight/)** 🎉
 
 ## Motivation
 
@@ -23,7 +23,7 @@ However, existing web-based experimental setups (e.g., [[1]](https://dl.acm.org/
 
 We developed a technical workflow for a web-based eye tracking code editor that addresses these limitations. The key idea is to use [CodeMirror](https://codemirror.net/), a popular web-based code editor, to provide code highlighting and editing features. We convert eye gaze data into semantic information by leveraging CodeMirror's APIs and resolving numerous technical issues.
 
-Below is a snapshot of our tool in action (using the mouse as a proxy for eye gaze). Feel free to try our [live demo](https://webeyecode.netlify.app/) as well!
+Below is a snapshot of our tool in action (using the mouse as a proxy for eye gaze). Feel free to try our [live demo](https://www.nztang.com/WebSight/) as well!
 
 <div align="center">
     <img src="./public/demo.gif" width="700px" max-width="100%" alt="Demo">
